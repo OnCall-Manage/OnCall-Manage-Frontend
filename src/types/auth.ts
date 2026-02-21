@@ -3,6 +3,10 @@ export type UserRole = "ADMIN" | "USER";
 export interface User {
     id: string;
     username: string;
+    nombre?: string;
+    apellido?: string;
+    email?: string;
+    puesto?: string;
     role: UserRole;
 }
 

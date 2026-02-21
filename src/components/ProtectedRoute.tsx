@@ -7,7 +7,15 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-    const { isAuthenticated, user, isLoading } = useAuth();
+    const { isAuthenticated, user, isLoading, token } = useAuth();
+
+    console.log("🔐 ProtectedRoute - Estado:", {
+        isLoading,
+        isAuthenticated,
+        user: user ? { username: user.username, role: user.role } : null,
+        hasToken: !!token,
+        requiredRole,
+    });
 
     if (isLoading) {
         return (
@@ -20,13 +28,16 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     }
 
     if (!isAuthenticated) {
+        console.log("❌ No autenticado - Redirigiendo a /login");
         return <Navigate to="/login" replace />;
     }
 
     if (requiredRole && user?.role !== requiredRole) {
+        console.log("❌ Rol insuficiente - Redirigiendo a /");
         return <Navigate to="/" replace />;
     }
 
+    console.log("✅ Usuario autenticado - Mostrando contenido");
     return <>{children}</>;
 }
 

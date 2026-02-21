@@ -17,11 +17,17 @@ export default function Login() {
         e.preventDefault();
         setError("");
 
+        console.log("🔐 Formulario enviado - Email:", email);
+
         try {
+            console.log("⏳ Esperando respuesta de login...");
             await login(email, password);
+            console.log("✅ Login exitoso - Redirigiendo a /");
             navigate("/", { replace: true });
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+            const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
+            console.error("❌ Error en login:", errorMessage);
+            setError(errorMessage);
         }
     };
 

@@ -17,15 +17,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedToken = localStorage.getItem(TOKEN_KEY);
         const storedUser = localStorage.getItem(USER_KEY);
 
+        console.log("🔍 AuthContext: Restaurando sesión...");
+        console.log("Token almacenado:", storedToken ? "✓ Existe" : "✗ No existe");
+        console.log("Usuario almacenado:", storedUser ? "✓ Existe" : "✗ No existe");
+
         if (storedToken && storedUser) {
             try {
+                const parsedUser = JSON.parse(storedUser);
+                console.log("✅ Usuario parseado correctamente:", parsedUser);
                 setToken(storedToken);
-                setUser(JSON.parse(storedUser));
+                setUser(parsedUser);
             } catch (error) {
-                console.error("Failed to restore auth data:", error);
+                console.error("❌ Error al parsear usuario:", error);
+                console.log("Datos corruptos detectados, limpiando localStorage...");
                 localStorage.removeItem(TOKEN_KEY);
                 localStorage.removeItem(USER_KEY);
             }
+        } else {
+            console.log("⚠️ No hay sesión almacenada");
         }
         setIsLoading(false);
     }, []);
@@ -35,13 +44,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(true);
             try {
                 const response = await loginService({ username, password });
+
                 const { token: newToken, user: newUser } = response;
+
+                if (!newToken || !newUser) {
+                    throw new Error("Token o usuario no recibidos del servidor");
+                }
+
+                // Validar que el usuario tenga las propiedades necesarias
+                if (!newUser.id || !newUser.username) {
+                    throw new Error("Usuario incompleto. Falta 'id' o 'username'");
+                }
 
                 setToken(newToken);
                 setUser(newUser);
 
                 localStorage.setItem(TOKEN_KEY, newToken);
                 localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+
+                console.log("✅ Sesión iniciada correctamente");
+            } catch (error) {
+                console.error("❌ Error en login:", error);
+                throw error;
             } finally {
                 setIsLoading(false);
             }

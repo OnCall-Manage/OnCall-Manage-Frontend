@@ -36,7 +36,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
         let errorMessage = `Error: ${response.status}`;
         try {
             const errorData = await response.json();
-            console.error("Backend Error Response:", errorData);
 
             if (typeof errorData === 'object' && !Array.isArray(errorData)) {
                 const messages = Object.entries(errorData)
@@ -59,10 +58,9 @@ async function handleResponse<T>(response: Response): Promise<T> {
                     errorMessage = text.length > 200 ? text.substring(0, 200) : text;
                 }
             } catch (e) {
-                console.error("Failed to parse error response:", e);
+                console.error("Failed to parse error response");
             }
         }
-        console.error("Final Error Message:", errorMessage);
         throw new Error(errorMessage);
     }
     return response.json();
@@ -76,7 +74,6 @@ export async function getAllChanges(): Promise<ChangeRequest[]> {
         });
         return handleResponse<ChangeRequest[]>(response);
     } catch (error) {
-        console.error("Failed to fetch changes:", error);
         throw error;
     }
 }
@@ -89,41 +86,21 @@ export async function getChangeById(id: string): Promise<ChangeRequest | undefin
         });
         return handleResponse<ChangeRequest>(response);
     } catch (error) {
-        console.error("Failed to fetch change:", error);
         throw error;
     }
 }
 
 export async function createChange(data: Omit<ChangeRequest, "id" | "createdAt" | "updatedAt">): Promise<ChangeRequest> {
     try {
-        console.log("🔹 createChange: Enviando datos al backend:", {
-            type: data.type,
-            code: data.code,
-            client: data.client,
-            objective: data.objective,
-            status: data.status,
-            date: data.date,
-            endDate: data.endDate,
-            startTime: data.startTime,
-            endTime: data.endTime,
-            resolver: data.resolver,
-            technology: data.technology,
-            servers: data.servers,
-            notes: data.notes,
-        });
-
         const response = await fetch(`${API_BASE_URL}/changes`, {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(data),
         });
 
-        console.log("🔹 createChange: Response Status =", response.status);
         const result = await handleResponse<ChangeRequest>(response);
-        console.log("✅ createChange: Success! Change created:", result);
         return result;
     } catch (error) {
-        console.error("❌ createChange: Failed:", error);
         throw error;
     }
 }
@@ -137,7 +114,6 @@ export async function updateChange(id: string, data: Partial<Omit<ChangeRequest,
         });
         return handleResponse<ChangeRequest>(response);
     } catch (error) {
-        console.error("Failed to update change:", error);
         throw error;
     }
 }
@@ -153,7 +129,6 @@ export async function deleteChange(id: string): Promise<boolean> {
         }
         return true;
     } catch (error) {
-        console.error("Failed to delete change:", error);
         throw error;
     }
 }
@@ -166,7 +141,6 @@ export async function getChangesByDate(date: string): Promise<ChangeRequest[]> {
         });
         return handleResponse<ChangeRequest[]>(response);
     } catch (error) {
-        console.error("Failed to fetch changes by date:", error);
         throw error;
     }
 }
@@ -182,7 +156,6 @@ export async function getChangesByWeek(startDate: string): Promise<ChangeRequest
         });
         return handleResponse<ChangeRequest[]>(response);
     } catch (error) {
-        console.error("Failed to fetch changes by week:", error);
         throw error;
     }
 }

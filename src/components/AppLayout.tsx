@@ -1,9 +1,8 @@
 import type {ReactNode} from "react";
-import { Database, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Database } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle.tsx";
-import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/UserMenu";
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -16,13 +15,7 @@ interface AppLayoutProps {
  * Designed to support future authentication (login gate, user menu, etc.)
  */
 export function AppLayout({ children, headerActions, stats }: AppLayoutProps) {
-    const navigate = useNavigate();
-    const { user, logout } = useAuth();
-
-    const handleLogout = () => {
-        logout();
-        navigate("/login", { replace: true });
-    };
+    const { user } = useAuth();
 
     return (
         <div className="min-h-screen bg-background">
@@ -33,27 +26,11 @@ export function AppLayout({ children, headerActions, stats }: AppLayoutProps) {
                         <Database className="h-5 w-5 text-primary" />
                         <h1 className="font-semibold text-foreground">DBA On-Call Manager</h1>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 ml-auto">
                         {stats}
                         <ThemeToggle />
-                        {user && (
-                            <div className="flex items-center gap-3 text-sm">
-                                <span className="text-foreground/70">
-                                    {user.username} <span className="text-xs text-foreground/50">({user.role})</span>
-                                </span>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleLogout}
-                                    className="h-8 w-8 p-0"
-                                    title="Cerrar sesión"
-                                >
-                                    <LogOut className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        )}
-                        {/* Future: User avatar / auth menu goes here */}
                         {headerActions}
+                        {user && <UserMenu />}
                     </div>
                 </div>
             </header>

@@ -36,9 +36,54 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
             },
             body: JSON.stringify(credentials),
         });
-        return handleResponse<AuthResponse>(response);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Error en login:", response.status);
+        }
+
+        const result = await handleResponse<any>(response);
+
+        let normalizedResponse: AuthResponse;
+
+        if (result.user && typeof result.user === 'object') {
+            const userObj = result.user;
+            normalizedResponse = {
+                token: result.token,
+                user: {
+                    id: userObj.id || userObj.userId,
+                    username: userObj.username,
+                    nombre: userObj.nombre || userObj.name || userObj.firstName,
+                    apellido: userObj.apellido || userObj.lastName || userObj.Apellido,
+                    email: userObj.email,
+                    puesto: userObj.puesto || userObj.position,
+                    role: userObj.role || "USER",
+                }
+            };
+            console.log("✅ Normalizado a:", normalizedResponse);
+        } else if (result.username && result.token) {
+            const userId = result.userid || result.id || result.userId || "unknown";
+            normalizedResponse = {
+                token: result.token,
+                user: {
+                    id: userId,
+                    username: result.username,
+                    nombre: result.nombre,
+                    apellido: result.apellido,
+                    email: result.email,
+                    puesto: result.puesto,
+                    role: result.role || "USER",
+                },
+            };
+        } else {
+            console.error("❌ Estructura de respuesta no válida");
+            throw new Error("Estructura de respuesta no reconocida");
+        }
+
+        console.log("✅ Login exitoso");
+        return normalizedResponse;
     } catch (error) {
-        console.error("Login failed:", error);
+        console.error("❌ Login fallido");
         throw error;
     }
 }
