@@ -47,13 +47,13 @@ export default function Login() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
                         <div className="space-y-3">
-                            <label htmlFor="email" className="block text-sm font-semibold text-white">
-                                Email
+                            <label htmlFor="username" className="block text-sm font-semibold text-white">
+                                Username
                             </label>
                             <Input
                                 id="email"
                                 type="text"
-                                placeholder="you@example.com"
+                                placeholder=" "
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}

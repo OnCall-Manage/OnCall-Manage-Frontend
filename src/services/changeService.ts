@@ -2,12 +2,6 @@ import type {ChangeRequest} from "@/types/change";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-interface ApiError {
-    error?: string;
-    message?: string;
-    [key: string]: unknown;
-}
-
 function getAuthToken(): string | null {
     return localStorage.getItem("auth_token");
 }

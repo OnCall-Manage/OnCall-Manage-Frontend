@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  type ChangeRequest, type ChangeType, type ChangeStatus, type Technology, type AffectedServer, CHANGE_TYPES, CHANGE_STATUSES, TECHNOLOGIES, isCrossMidnight } from "@/types/change";
+  type ChangeRequest, type ChangeType, type ChangeStatus, type Technology, type AffectedServer, CHANGE_TYPES, CHANGE_STATUSES, TECHNOLOGIES } from "@/types/change";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,7 +44,6 @@ export function ChangeForm({ initialData, onSubmit, onCancel }: ChangeFormProps)
     e.preventDefault();
     setValidationError(null);
 
-    // Validación básica
     if (!code.trim()) {
       setValidationError("Change Code is required");
       return;
@@ -70,7 +69,6 @@ export function ChangeForm({ initialData, onSubmit, onCancel }: ChangeFormProps)
       return;
     }
 
-    // Filtrar servidores: AMBOS hostname Y ipAddress deben estar completos
     const validServers = servers.filter(s => s.hostname.trim() && s.ipAddress.trim());
 
     if (validServers.length === 0) {
@@ -88,7 +86,7 @@ export function ChangeForm({ initialData, onSubmit, onCancel }: ChangeFormProps)
       endDate: computedEndDate || date,
       startTime,
       endTime,
-      notes: notes || null,
+      notes: notes || " ",
       servers: validServers,
       technology,
       resolver,
@@ -127,7 +125,7 @@ export function ChangeForm({ initialData, onSubmit, onCancel }: ChangeFormProps)
           </div>
           <div className="space-y-2">
             <Label>Change Code</Label>
-            <Input value={code} onChange={e => setCode(e.target.value)} placeholder="200-11509" className="font-mono" required />
+            <Input value={code} onChange={e => setCode(e.target.value)} placeholder=" " className="font-mono" required />
           </div>
           <div className="space-y-2">
             <Label>Status</Label>

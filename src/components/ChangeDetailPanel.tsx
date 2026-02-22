@@ -60,7 +60,7 @@ export function ChangeDetailPanel({ change, onClose, onEdit }: ChangeDetailPanel
               {change.servers.map((s, i) => (
                   <div key={i} className="flex gap-4 text-xs font-mono text-muted-foreground">
                     <span className="text-foreground">{s.hostname}</span>
-                    <span>{s.ip}</span>
+                    <span>{s.ipAddress}</span>
                   </div>
               ))}
             </div>

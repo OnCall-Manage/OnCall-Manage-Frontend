@@ -6,6 +6,7 @@ export type Technology = "Oracle" | "SQL Server" | "PostgreSQL" | "MySQL" | "Mon
 
 export interface AffectedServer {
     hostname: string;
+
     ipAddress: string;
 }
 

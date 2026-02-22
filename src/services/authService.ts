@@ -37,10 +37,6 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
             body: JSON.stringify(credentials),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("❌ Error en login:", response.status);
-        }
 
         const result = await handleResponse<any>(response);
 
