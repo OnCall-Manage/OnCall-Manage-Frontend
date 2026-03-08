@@ -7,6 +7,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
 
+// Variable global para almacenar la función de navegación
+let globalNavigate: ((path: string) => void) | null = null;
+
+export function setAuthNavigate(navigate: (path: string) => void) {
+    globalNavigate = navigate;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);

@@ -1,4 +1,5 @@
 import type {ChangeRequest} from "@/types/change";
+import { handleSessionExpired } from "@/utils/sessionHandler";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
@@ -18,11 +19,8 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
-    // Handle 401 Unauthorized - logout user
     if (response.status === 401) {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("auth_user");
-        window.location.href = "/login";
+        handleSessionExpired();
         throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
     }
 

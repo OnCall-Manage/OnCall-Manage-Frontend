@@ -1,8 +1,14 @@
 import type { AuthResponse, LoginRequest } from "@/types/auth";
+import { handleSessionExpired } from "@/utils/sessionHandler";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 async function handleResponse<T>(response: Response): Promise<T> {
+    if (response.status === 401) {
+        handleSessionExpired();
+        throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
+    }
+
     if (!response.ok) {
         let errorMessage = `Error: ${response.status}`;
         try {
