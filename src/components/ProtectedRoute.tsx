@@ -9,14 +9,18 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-    const { isAuthenticated, user, isLoading, token } = useAuth();
+    const { isAuthenticated, user, isLoading } = useAuth();
+
+    const storedToken = localStorage.getItem("auth_token");
+    if (!storedToken) {
+        return <Navigate to="/login" replace />;
+    }
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("auth_token");
         if (!storedToken && isAuthenticated) {
             handleSessionExpired();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, storedToken]);
 
     if (isLoading) {
         return (

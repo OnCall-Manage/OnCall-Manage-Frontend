@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -8,25 +8,27 @@ import { Database } from "lucide-react";
 
 export default function Login() {
     const navigate = useNavigate();
-    const { login, isLoading } = useAuth();
+    const { login, isLoading, isAuthenticated } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    // Si ya hay sesión activa, redirigir a home
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
-        console.log("🔐 Formulario enviado - Email:", email);
-
         try {
-            console.log("⏳ Esperando respuesta de login...");
             await login(email, password);
-            console.log("✅ Login exitoso - Redirigiendo a /");
             navigate("/", { replace: true });
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again.";
-            console.error("❌ Error en login:", errorMessage);
             setError(errorMessage);
         }
     };

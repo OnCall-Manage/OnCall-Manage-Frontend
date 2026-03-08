@@ -1,25 +1,26 @@
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { handleSessionExpired } from "@/utils/sessionHandler";
+import { validateToken } from "@/services/authService";
 
+/**
+ * Hook que valida periódicamente si el token sigue siendo válido en el backend.
+ */
 export function useTokenValidation() {
-    const { isAuthenticated, token } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
-        if (!isAuthenticated || !token) {
+        if (!isAuthenticated) {
             return;
         }
 
-        const validationInterval = setInterval(() => {
-            const storedToken = localStorage.getItem("auth_token");
-
-            if (!storedToken) {
-                handleSessionExpired();
+        const validationInterval = setInterval(async () => {
+            const isValid = await validateToken();
+            if (!isValid) {
                 clearInterval(validationInterval);
             }
-        }, 3600000);
+        }, 1800000);
 
         return () => clearInterval(validationInterval);
-    }, [isAuthenticated, token]);
+    }, [isAuthenticated]);
 }
 

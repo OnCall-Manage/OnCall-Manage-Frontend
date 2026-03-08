@@ -19,7 +19,8 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
-    if (response.status === 401) {
+    // Detectar si el token es inválido o expiró (401 o 403)
+    if (response.status === 401 || response.status === 403) {
         handleSessionExpired();
         throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
     }

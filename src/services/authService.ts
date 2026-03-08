@@ -4,7 +4,7 @@ import { handleSessionExpired } from "@/utils/sessionHandler";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 async function handleResponse<T>(response: Response): Promise<T> {
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 403) {
         handleSessionExpired();
         throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
     }
@@ -33,6 +33,31 @@ async function handleResponse<T>(response: Response): Promise<T> {
     return response.json();
 }
 
+export async function validateToken(): Promise<boolean> {
+    const token = localStorage.getItem("auth_token");
+    if (!token) return false;
+
+    try {
+        // Validar token usando el endpoint /api/auth/validate del backend
+        const response = await fetch(`${API_BASE_URL}/auth/validate`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            handleSessionExpired();
+            return false;
+        }
+
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
+
 export async function login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -42,7 +67,6 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
             },
             body: JSON.stringify(credentials),
         });
-
 
         const result = await handleResponse<any>(response);
 
@@ -62,7 +86,6 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
                     role: userObj.role || "USER",
                 }
             };
-            console.log("✅ Normalizado a:", normalizedResponse);
         } else if (result.username && result.token) {
             const userId = result.userid || result.id || result.userId || "unknown";
             normalizedResponse = {
@@ -82,7 +105,6 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
             throw new Error("Estructura de respuesta no reconocida");
         }
 
-        console.log("✅ Login exitoso");
         return normalizedResponse;
     } catch (error) {
         console.error("❌ Login fallido");

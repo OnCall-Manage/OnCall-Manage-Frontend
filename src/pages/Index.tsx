@@ -21,16 +21,14 @@ const Index = () => {
     const [deleteTarget, setDeleteTarget] = useState<ChangeRequest | null>(null);
     const [weekStart, setWeekStart] = useState(new Date());
 
+
     const handleCreate = async (data: Omit<ChangeRequest, "id" | "createdAt" | "updatedAt">) => {
         try {
-            console.log("🔵 Index.handleCreate: Starting...");
             await create(data);
-            console.log("✅ Index.handleCreate: Success!");
             setShowForm(false);
             toast.success("Change created successfully");
         } catch (err) {
             const message = err instanceof Error ? err.message : "Error creating change";
-            console.error("❌ Index.handleCreate Error:", message);
             toast.error(message);
         }
     };
@@ -45,7 +43,6 @@ const Index = () => {
         } catch (err) {
             const message = err instanceof Error ? err.message : "Error updating change";
             toast.error(message);
-            console.error("Update error:", err);
         }
     };
 
@@ -59,7 +56,6 @@ const Index = () => {
         } catch (err) {
             const message = err instanceof Error ? err.message : "Error deleting change";
             toast.error(message);
-            console.error("Delete error:", err);
         }
     };
 
