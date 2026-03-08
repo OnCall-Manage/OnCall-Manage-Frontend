@@ -24,24 +24,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedToken = localStorage.getItem(TOKEN_KEY);
         const storedUser = localStorage.getItem(USER_KEY);
 
-        console.log("🔍 AuthContext: Restaurando sesión...");
-        console.log("Token almacenado:", storedToken ? "✓ Existe" : "✗ No existe");
-        console.log("Usuario almacenado:", storedUser ? "✓ Existe" : "✗ No existe");
-
         if (storedToken && storedUser) {
             try {
                 const parsedUser = JSON.parse(storedUser);
-                console.log("✅ Usuario parseado correctamente:", parsedUser);
                 setToken(storedToken);
                 setUser(parsedUser);
             } catch (error) {
-                console.error("❌ Error al parsear usuario:", error);
-                console.log("Datos corruptos detectados, limpiando localStorage...");
+                console.error("Error al restaurar sesión:", error);
                 localStorage.removeItem(TOKEN_KEY);
                 localStorage.removeItem(USER_KEY);
             }
-        } else {
-            console.log("⚠️ No hay sesión almacenada");
         }
         setIsLoading(false);
     }, []);
@@ -68,10 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 localStorage.setItem(TOKEN_KEY, newToken);
                 localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-
-                console.log("✅ Sesión iniciada correctamente");
             } catch (error) {
-                console.error("❌ Error en login:", error);
+                console.error("Error en login:", error);
                 throw error;
             } finally {
                 setIsLoading(false);
@@ -86,6 +76,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
     }, []);
+
+    // Exponer logout en window para que sessionHandler pueda acceder
+    useEffect(() => {
+        (window as any).__authLogout = logout;
+
+        // Escuchar evento de sesión expirada
+        const handleSessionExpired = () => {
+            logout();
+        };
+
+        window.addEventListener("sessionExpired", handleSessionExpired);
+
+        return () => {
+            window.removeEventListener("sessionExpired", handleSessionExpired);
+        };
+    }, [logout]);
 
     const value: AuthContextType = {
         user,
